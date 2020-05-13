@@ -17,6 +17,7 @@
 #include <ifaddrs.h>
 #include <net/if.h>
 #include <stdarg.h>
+#include <time.h>
 /* the next two includes probably aren't relevant for you, but I typically use them all anyway */
 #include <math.h>
 #include <sys/termios.h>

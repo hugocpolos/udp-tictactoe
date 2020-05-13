@@ -1,5 +1,10 @@
 #include <server.h>
 
+int rand_range(int min, int max)
+{
+	return min + rand()%(max - min + 1);	
+}
+
 int create_socket(int port)
 {
 	int sockfd;
@@ -34,19 +39,50 @@ Mensagem receive_message(int sockfd)
     unsigned int addr_len;
 
     addr_len = sizeof(m.client_addr);
-
+    memset(&(m.data), '\0', TAM_MSG);
     recvfrom(sockfd,m.data,TAM_MSG,0,(struct sockaddr *)&(m.client_addr), &addr_len);
 
     return m;
 }
 
+void send_message(int socket, char *msg, struct sockaddr_in client_addr)
+{
+    sendto(socket, (const char *)msg, strlen(msg), 
+        MSG_CONFIRM, (const struct sockaddr *) &client_addr,  
+            sizeof(client_addr));
+}
+
+int wait_for_login( void )
+{
+    int socket;
+    int clientes_sockets[10];
+    int clientes_conectados = 0;
+    Mensagem m;
+    char msg[TAM_MSG];
+    int porta;
+    socket = create_socket(8080);
+
+    while (42)
+    {
+        m = receive_message(socket);
+        if(!strcmp(m.data, "LOGIN"))
+        {
+            /* novo login */
+            /* cria novo socket para comunicação dedicada com esse cliente */
+            porta = rand_range(20000,64000);
+            clientes_sockets[clientes_conectados] = create_socket(porta);
+            
+            /* armazena em msg a porta como string, para ser enviada ao cliente */
+            sprintf(msg,"%d", porta);
+            send_message(clientes_sockets[clientes_conectados], msg, m.client_addr);
+            close(clientes_sockets[clientes_conectados]);
+        }
+    }
+    close(socket);
+}
 
 int main()
 {
-    int socket;
-    Mensagem m;
-	socket = create_socket(8080);
-    m = receive_message(socket);
-    printf("mensagem recebida: %s\n", m.data);
-    return 0;
+    srand(time(0));
+    wait_for_login();
 }
