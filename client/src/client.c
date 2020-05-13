@@ -62,7 +62,7 @@ int main()
 	char msg[1024];
 	int server_port = 8080;
 
-	strcpy(msg, "OI, EU VIM PELA REDE TE DAR UM OI.\n");
+	gets(msg);
 
 	socket = create_client_socket();
 	envia_mensagem(socket, msg, "hugo", server_port);
