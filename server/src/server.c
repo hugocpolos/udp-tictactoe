@@ -1,4 +1,6 @@
 #include <server.h>
+Game tictactoe;
+pthread_mutex_t lock;
 
 int rand_range(int min, int max)
 {
@@ -10,9 +12,11 @@ void *client_connection(void *client_address)
     Mensagem m;
     int socket;
     Player p;
-    char msg[1024];
+    char msg[2056];
     int client_port;
     Sockaddr *address_rcv = (Sockaddr *)client_address;
+
+    p.addr = *address_rcv;
 
     /* cria novo socket para comunicação dedicada com esse cliente */
     client_port = rand_range(20000,64000);
@@ -21,22 +25,77 @@ void *client_connection(void *client_address)
     /* armazena em msg a porta como string, para ser enviada ao cliente */
     sprintf(msg,"%d", client_port);
     
-    send_message(socket, msg, *address_rcv);
+    send_message(socket, msg, p.addr);
 
     /* Espera pelo nome do cliente */
     m = receive_message(socket);
 
-    printf("%s", m.data);
-
     strcpy(p.name, m.data);
 
-    printf("client connected.\n");
-    do
+    /* Nesse ponto há 3 possibilidades:
+    *   - ESPERANDO: há apenas um jogador, e estamos esperando o outro
+    *   - PRONTO: 2 jogadores conectados, partida vai começar.
+    *   - CHEIO: Há 2 jogadores jogando.
+    */
+
+    /* Verifica qual dos estados estamos */
+
+    if (tictactoe.number_of_players == 2)
     {
-        m=receive_message(socket);
-        printf("%s: %s\n", p.name, m.data);
-    }while(strcmp(m.data, "exit"));
-    printf("client disconneted.\n");
+        /* envia o estado CHEIO para o jogador */
+        strcpy(msg, "CHEIO");
+        send_message(socket, msg, p.addr);
+        close(socket);
+        return NULL;
+    }
+    else
+    {
+        /* insere o jogador na partida */
+        pthread_mutex_lock(&lock);
+        tictactoe.players[tictactoe.number_of_players] = p;
+        p.id = tictactoe.number_of_players++;
+        pthread_mutex_unlock(&lock);
+
+        /* envia o estado atual para o jogador */
+        strcpy(msg, (tictactoe.number_of_players == 1) ? "ESPERANDO" : "PRONTO");
+        send_message(socket, msg, p.addr);
+
+        /* se o estado for PRONTO, faz o sorteio dos turnos */
+        if (strcmp(msg, "PRONTO") == 0)
+        {
+            pthread_mutex_lock(&lock);
+            tictactoe.first_player = rand_range(0,1);
+            pthread_mutex_unlock(&lock);
+        }
+    }
+
+    /* Se houver apenas um jogador conectado, espera o outro conectar */
+    printf("jogador conectado, aguardando.\n");
+    while (tictactoe.number_of_players < 2)
+    {
+        sleep(1);
+    }
+
+    /* Jogo começou - envia FIRST para o primeiro jogador, e SECOND para o segundo.*/
+    if (p.id == tictactoe.first_player)
+    {
+        strcpy(msg, "FIRST");
+    }
+    else
+    {
+        strcpy(msg, "SECOND");
+    }
+    send_message(socket, msg, p.addr);
+
+    while ( 1 )
+    {
+        /* Espera jogada */
+        m = receive_message(socket);
+        sprintf(msg, "%s: %s", p.name, m.data);
+
+        /* Envia jogada para o outro jogador */
+        send_message(socket, msg, tictactoe.players[1-p.id].addr);
+    }
 
     close(socket);
     return NULL;
@@ -97,29 +156,55 @@ int wait_for_login( void )
     Mensagem m;
 
     // aloca memória para as threads
-    client_threads = malloc(sizeof(pthread_t));
+    client_threads = malloc(MAX_LOGINS * sizeof(pthread_t));
 
     // inicia o socket de login
     socket = create_socket(8080);
 
+    printf("Aguardando a conexão de jogadores.\n");
     while (42)
     {
         m = receive_message(socket);
         if(strcmp(m.data, "LOGIN") == 0)
         {
-            /* novo login */
-            if(pthread_create(client_threads, NULL, client_connection, &m.client_addr))
+            if(conn_clients > MAX_LOGINS)
             {
-                printf("erro criando thread.\n");
+                printf("falha no login, numero maximo de clientes conectados.\n");
             }
-            conn_clients++;
+            else
+            {
+                /* novo login */
+                if(pthread_create(&client_threads[conn_clients], NULL, client_connection, &m.client_addr))
+                {
+                    printf("erro criando thread.\n");
+                    printf("falha no login,\n");
+                }
+                conn_clients++;
+            }
         }
     }
     close(socket);
 }
 
-int main()
+int init_server(void)
 {
     srand(time(0));
+    tictactoe.number_of_players = 0;
+    if (pthread_mutex_init(&lock, NULL) != 0) { 
+        printf("Inicialização do mutex falhou.\n"); 
+        return 1;
+    }
+    return 0;
+}
+
+int main()
+{
+    if(init_server())
+    {
+        printf("falha ao inicializar o servidor.\n");
+        return 1;
+    }
+    printf("servidor inicializado.\n");
     wait_for_login();
+    return 0;
 }
