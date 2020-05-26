@@ -5,25 +5,41 @@ int rand_range(int min, int max)
 	return min + rand()%(max - min + 1);	
 }
 
-void client_connection(int sockfd, struct sockaddr_in client_addr)
+void *client_connection(void *client_address)
 {
     Mensagem m;
+    int socket;
     Player p;
+    char msg[1024];
+    int client_port;
+    Sockaddr *address_rcv = (Sockaddr *)client_address;
+
+    /* cria novo socket para comunicação dedicada com esse cliente */
+    client_port = rand_range(20000,64000);
+    socket = create_socket(client_port);
+
+    /* armazena em msg a porta como string, para ser enviada ao cliente */
+    sprintf(msg,"%d", client_port);
+    
+    send_message(socket, msg, *address_rcv);
 
     /* Espera pelo nome do cliente */
-    m=receive_message(sockfd);
+    m = receive_message(socket);
+
+    printf("%s", m.data);
+
     strcpy(p.name, m.data);
 
     printf("client connected.\n");
     do
     {
-        m=receive_message(sockfd);
+        m=receive_message(socket);
         printf("%s: %s\n", p.name, m.data);
     }while(strcmp(m.data, "exit"));
     printf("client disconneted.\n");
 
-    close(sockfd);
-    return;
+    close(socket);
+    return NULL;
 }
 
 int create_socket(int port)
@@ -76,11 +92,12 @@ void send_message(int socket, char *msg, struct sockaddr_in client_addr)
 int wait_for_login( void )
 {
     int socket;
-    int client_sockets[10];
     int conn_clients = 0;
+    pthread_t *client_threads;
     Mensagem m;
-    char msg[TAM_MSG];
-    int porta;
+
+    // aloca memória para as threads
+    client_threads = malloc(sizeof(pthread_t));
 
     // inicia o socket de login
     socket = create_socket(8080);
@@ -91,15 +108,10 @@ int wait_for_login( void )
         if(strcmp(m.data, "LOGIN") == 0)
         {
             /* novo login */
-            /* cria novo socket para comunicação dedicada com esse cliente */
-            porta = rand_range(20000,64000);
-            client_sockets[conn_clients] = create_socket(porta);
-            
-            /* armazena em msg a porta como string, para ser enviada ao cliente */
-            sprintf(msg,"%d", porta);
-            send_message(client_sockets[conn_clients], msg, m.client_addr);
-
-            client_connection(client_sockets[conn_clients], m.client_addr);
+            if(pthread_create(client_threads, NULL, client_connection, &m.client_addr))
+            {
+                printf("erro criando thread.\n");
+            }
             conn_clients++;
         }
     }
