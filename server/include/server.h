@@ -28,6 +28,11 @@ typedef struct messagem
     struct sockaddr_in client_addr;
 }Mensagem;
 
+typedef struct player
+{
+    char name[64];
+}Player;
+
 int create_socket(int port);
 Mensagem receive_message(int sockfd);
 

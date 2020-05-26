@@ -5,6 +5,27 @@ int rand_range(int min, int max)
 	return min + rand()%(max - min + 1);	
 }
 
+void client_connection(int sockfd, struct sockaddr_in client_addr)
+{
+    Mensagem m;
+    Player p;
+
+    /* Espera pelo nome do cliente */
+    m=receive_message(sockfd);
+    strcpy(p.name, m.data);
+
+    printf("client connected.\n");
+    do
+    {
+        m=receive_message(sockfd);
+        printf("%s: %s\n", p.name, m.data);
+    }while(strcmp(m.data, "exit"));
+    printf("client disconneted.\n");
+
+    close(sockfd);
+    return;
+}
+
 int create_socket(int port)
 {
 	int sockfd;
@@ -55,27 +76,31 @@ void send_message(int socket, char *msg, struct sockaddr_in client_addr)
 int wait_for_login( void )
 {
     int socket;
-    int clientes_sockets[10];
-    int clientes_conectados = 0;
+    int client_sockets[10];
+    int conn_clients = 0;
     Mensagem m;
     char msg[TAM_MSG];
     int porta;
+
+    // inicia o socket de login
     socket = create_socket(8080);
 
     while (42)
     {
         m = receive_message(socket);
-        if(!strcmp(m.data, "LOGIN"))
+        if(strcmp(m.data, "LOGIN") == 0)
         {
             /* novo login */
             /* cria novo socket para comunicação dedicada com esse cliente */
             porta = rand_range(20000,64000);
-            clientes_sockets[clientes_conectados] = create_socket(porta);
+            client_sockets[conn_clients] = create_socket(porta);
             
             /* armazena em msg a porta como string, para ser enviada ao cliente */
             sprintf(msg,"%d", porta);
-            send_message(clientes_sockets[clientes_conectados], msg, m.client_addr);
-            close(clientes_sockets[clientes_conectados]);
+            send_message(client_sockets[conn_clients], msg, m.client_addr);
+
+            client_connection(client_sockets[conn_clients], m.client_addr);
+            conn_clients++;
         }
     }
     close(socket);

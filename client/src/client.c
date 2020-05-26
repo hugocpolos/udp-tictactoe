@@ -67,22 +67,61 @@ int rand_range(int min, int max)
 	return min + rand()%(max - min + 1);	
 }
 
-int main()
+int login(int socket, char *host, int port)
+/* Realiza login no servidor
+ * retorna número da porta de comunicação dedicada com o servidor.	 
+*/
+{
+	Mensagem m;
+	char msg[6];
+	strcpy(msg, "LOGIN");
+
+	envia_mensagem(socket, msg, host, port);
+	m = receive_message(socket);
+
+	return atoi(m.data);
+}
+
+int play_tictactoe(int socket, char *host, int port)
+{
+	char msg[1024];
+
+	/* envia o nome do jogador para o servidor: */
+	printf("Nome do jogador: ");
+	/* fgets é alternativa ao gets. fonte: https://stackoverflow.com/questions/43174201/alternative-to-gets */
+	if (fgets(msg, sizeof msg, stdin)) {
+		msg[strcspn(msg, "\n")] = '\0';
+	}
+	envia_mensagem(socket, msg, host, port);
+
+
+	printf("enter 'exit' to quit\n");
+	do
+	{
+		printf("> ");
+		if (fgets(msg, sizeof msg, stdin)) {
+			msg[strcspn(msg, "\n")] = '\0';
+		}
+		envia_mensagem(socket, msg, host, port);
+	}
+	while(strcmp(msg, "exit"));
+	return 0;
+}
+
+int main(int argc, char* argv[])
 {
 	int socket;
-	char msg[1024];
-	int server_port = 8080;
-	Mensagem m;
+	int login_server_port = 8080;
+	int game_server_port;
 
-	srand(time(0));	
-	gets(msg, "LOGIN");
-
+	srand(time(0));
 	socket = create_client_socket();
-	envia_mensagem(socket, msg, "hugo", server_port);
-	m = receive_message(socket);
-	printf("porta recebida: %s\n", m.data);
+	game_server_port = login(socket, "127.0.0.1", login_server_port);
+
+	printf("porta de jogo: %d\n", game_server_port);
+
+	play_tictactoe(socket, "127.0.0.1", game_server_port);
 
 	close(socket);
-
 
 }
