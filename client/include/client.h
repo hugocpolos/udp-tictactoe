@@ -1,3 +1,4 @@
+#define TAM_MSG 1024
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -20,6 +21,12 @@
 /* the next two includes probably aren't relevant for you, but I typically use them all anyway */
 #include <math.h>
 #include <sys/termios.h>
+
+typedef struct messagem
+{
+    char data[TAM_MSG];
+    struct sockaddr_in client_addr;
+}Mensagem;
 
 int create_socket(void);
 int rand_range(int min, int max);
