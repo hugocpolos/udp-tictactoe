@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <client.h>
 
 int create_client_socket(void)
@@ -163,6 +162,8 @@ int main(int argc, char* argv[])
 	game_server_port = login(socket, "127.0.0.1", login_server_port);
 
 	printf("porta de jogo: %d\n", game_server_port);
+
+	ShowMenu();
 
 	play_tictactoe(socket, "127.0.0.1", game_server_port);
 
