@@ -29,17 +29,15 @@ int init_shared_variables(void)
 void start_remote_tictactoe_game(int socket, Player p, unsigned short game_id)
 {
     Mensagem m;
-    char msg[TAM_JOGADA];
     int outro_jogador = 1 - p.id;
 
-    while ( strcmp(m.data, "VENCEDOR") && strcmp(m.data, "PERDEDOR") )
+    while ( strcmp(m.data, "FIM"))
     {
         /* Espera jogada */
         m = receive_message(socket);
-        sprintf(msg, "%s: %s", p.name, m.data);
 
         /* Envia jogada para o outro jogador */
-        send_message(socket, msg, tictactoe[game_id].players[outro_jogador].addr);
+        send_message(socket, m.data, tictactoe[game_id].players[outro_jogador].addr);
     }
 
     pthread_mutex_lock(&lock);
@@ -59,6 +57,7 @@ void *client_connection_thread(void *client_address)
     char msg[2056];
     int client_port;
     Sockaddr *address_rcv = (Sockaddr *)client_address;
+    int outro_jogador;
 
     /* Associa o endereço recebido por endereço ao endereço desse jogador */
     p.addr = *address_rcv;
@@ -123,6 +122,7 @@ void *client_connection_thread(void *client_address)
     /* insere o jogador na partida */
     pthread_mutex_lock(&lock);
     p.id = tictactoe[i].number_of_players;
+    outro_jogador = 1 - p.id;
     tictactoe[i].players[tictactoe[i].number_of_players] = p;
     tictactoe[i].number_of_players++;
     pthread_mutex_unlock(&lock);
@@ -146,6 +146,11 @@ void *client_connection_thread(void *client_address)
     {
         sleep(1);
     }
+
+    /* envia seu nome para o advversario */
+    strcpy(msg, p.name);
+    send_message(socket, msg, tictactoe[i].players[outro_jogador].addr);
+    sleep(1);
 
     /* Jogo começou - envia FIRST para o primeiro jogador, e SECOND para o segundo.*/
     printf("%s: partida de número %i iniciada.\n", p.name, i);

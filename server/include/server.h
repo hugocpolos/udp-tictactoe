@@ -1,6 +1,7 @@
 #define TAM_MSG 1024
 #define NRO_PARTIDAS_SIMULTANEAS 2
 
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
