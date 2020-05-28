@@ -43,6 +43,8 @@ void start_remote_tictactoe_game(int socket, Player p, unsigned short game_id)
     pthread_mutex_lock(&lock);
     tictactoe[game_id].number_of_players = 0;
     pthread_mutex_unlock(&lock);
+    printf("Jogador %s saiu.\n", p.name);
+    printf("Finalizando partida %i\n", game_id);
     return;
 }
 
@@ -77,27 +79,42 @@ void *client_connection_thread(void *client_address)
     /* O nome recebido é associado como nome do jogador */
     strcpy(p.name, m.data);
 
+    
+    printf("Jogador %s conectado.\n", p.name);
+    printf("%s: Procurando jogo.\n", p.name);
+
     /*
-    *   Verifica o número de jogadores conectados até o momento na partida atual. 
+    *   Busca por uma sala de jogo no servidor.
     *   Nesse ponto há 3 possibilidades:
-    *   - ESPERANDO: há apenas um jogador, e estamos esperando o outro
-    *   - PRONTO: 2 jogadores conectados, partida vai começar.
-    *   - CHEIO: Há 2 jogadores jogando.
+    *   - ESPERANDO: O jogador encontrou uma sala vazia e está esperando outro jogador.
+    *   - PRONTO: Entrou em uma sala com outro jogador.
+    *   - CHEIO: Todas salas de jogo estão cheias
     */
 
-    /* Verifica qual dos estados estamos */
+    /* Procura por uma sala de jogo.*/
     i = 0;
-    while(tictactoe[i].number_of_players == 2)
-    /* Percorre o array de partidas procurando um com menos de 2 jogadores */
+    /* Procura por alguma sala com alguém sozinho esperando */
+    while(tictactoe[i].number_of_players != 1 && i < NRO_PARTIDAS_SIMULTANEAS)
     {
         i++;
-        if (i == NRO_PARTIDAS_SIMULTANEAS)
+    }
+    if (i == NRO_PARTIDAS_SIMULTANEAS)
+    {
+        /* Não encontrou. Procura por uma sala vazia. */
+        i = 0;
+        while(tictactoe[i].number_of_players == 2)
+        /* Percorre o array de partidas procurando um com menos de 2 jogadores */
         {
-            /* Todas partidas estão cheias, informa o jogador */
-            strcpy(msg, "CHEIO");
-            send_message(socket, msg, p.addr);
-            close(socket);
-            return NULL;
+            i++;
+            if (i == NRO_PARTIDAS_SIMULTANEAS)
+            {
+                /* Todas partidas estão cheias, informa o jogador */
+                printf("%s: Todas salas estão cheias, desconectando.\n", p.name);
+                strcpy(msg, "CHEIO");
+                send_message(socket, msg, p.addr);
+                close(socket);
+                return NULL;
+            }
         }
     }
     
@@ -112,6 +129,7 @@ void *client_connection_thread(void *client_address)
 
     /* envia o estado atual para o jogador */
     strcpy(msg, (tictactoe[i].number_of_players == 1) ? "ESPERANDO" : "PRONTO");
+    printf("%s: Partida de número %d localizada. Estado: %s\n", p.name, i, msg);
     send_message(socket, msg, p.addr);
 
     /* se o estado for PRONTO, faz o sorteio dos turnos */
@@ -124,7 +142,6 @@ void *client_connection_thread(void *client_address)
 
 
     /* Se houver apenas um jogador conectado, espera o outro conectar */
-    printf("jogador conectado, aguardando.\n");
     while (tictactoe[i].number_of_players < 2)
     {
         sleep(1);
@@ -136,6 +153,7 @@ void *client_connection_thread(void *client_address)
     sleep(1);
 
     /* Jogo começou - envia FIRST para o primeiro jogador, e SECOND para o segundo.*/
+    printf("%s: partida de número %i iniciada.\n", p.name, i);
     if (p.id == tictactoe[i].first_player)
     {
         strcpy(msg, "FIRST");
