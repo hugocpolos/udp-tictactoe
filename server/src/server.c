@@ -57,11 +57,8 @@ int wait_for_login( int port )
 {
     int socket;
     int conn_clients = 0;
-    pthread_t *client_threads;
+    pthread_t client_thread;
     Mensagem m;
-
-    // aloca memória para as threads
-    client_threads = malloc(MAX_LOGINS * sizeof(pthread_t));
 
     // inicia o socket de login
     socket = create_socket(port);
@@ -73,20 +70,14 @@ int wait_for_login( int port )
         if(strcmp(m.data, "LOGIN") == 0)
         {
             printf("Nova conexão.\n");
-            if(conn_clients > MAX_LOGINS)
+
+            /* novo login */
+            if(pthread_create(&client_thread, NULL, client_connection_thread, &m.client_addr))
             {
-                printf("falha no login, numero maximo de clientes conectados.\n");
+                printf("erro criando thread.\n");
+                printf("falha no login,\n");
             }
-            else
-            {
-                /* novo login */
-                if(pthread_create(&client_threads[conn_clients], NULL, client_connection_thread, &m.client_addr))
-                {
-                    printf("erro criando thread.\n");
-                    printf("falha no login,\n");
-                }
-                conn_clients++;
-            }
+            conn_clients++;
         }
     }
     close(socket);
