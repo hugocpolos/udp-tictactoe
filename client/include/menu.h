@@ -1,7 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <Player.h>
-#include <Game.h>
 
 
 //Mostra o menu

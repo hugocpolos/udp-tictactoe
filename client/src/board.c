@@ -1,4 +1,4 @@
-#include <Board.h>
+#include <board.h>
 
 //Limpa o console e desenha o tabuleiro
 void DrawBoard(char gameBoard[9])
@@ -19,7 +19,7 @@ void DrawBoardWithNames(char gameBoard[9], char *player1Name, char *player2Name,
   if(system("clear") == 0)
   {
 	//Verifica quem está jogando e mostra o nome correspondente
-	if(playerCharacter == 'X')
+	if(*playerCharacter == 'X')
 	{
 		printf("%s, sua vez\n\n", player1Name);
 	}
@@ -39,14 +39,14 @@ void DrawBoardWithNames(char gameBoard[9], char *player1Name, char *player2Name,
 int CheckPlayerWin(char gameBoard[9])
 {
 	//Verificação de todos os possíveis casos de vitória
-	if(gameBoard[0] == gameBoard[1] && gameBoard[1] == gameBoard[2]
-	|| gameBoard[3] == gameBoard[4] && gameBoard[4] == gameBoard[5]
-	|| gameBoard[6] == gameBoard[7] && gameBoard[7] == gameBoard[8]
-	|| gameBoard[0] == gameBoard[3] && gameBoard[3] == gameBoard[6]
-	|| gameBoard[1] == gameBoard[4] && gameBoard[4] == gameBoard[7]
-	|| gameBoard[2] == gameBoard[5] && gameBoard[5] == gameBoard[8]
-	|| gameBoard[0] == gameBoard[4] && gameBoard[4] == gameBoard[8]
-	|| gameBoard[2] == gameBoard[4] && gameBoard[4] == gameBoard[6])
+	if((gameBoard[0] == gameBoard[1] && gameBoard[1] == gameBoard[2])
+	|| (gameBoard[3] == gameBoard[4] && gameBoard[4] == gameBoard[5])
+	|| (gameBoard[6] == gameBoard[7] && gameBoard[7] == gameBoard[8])
+	|| (gameBoard[0] == gameBoard[3] && gameBoard[3] == gameBoard[6])
+	|| (gameBoard[1] == gameBoard[4] && gameBoard[4] == gameBoard[7])
+	|| (gameBoard[2] == gameBoard[5] && gameBoard[5] == gameBoard[8])
+	|| (gameBoard[0] == gameBoard[4] && gameBoard[4] == gameBoard[8])
+	|| (gameBoard[2] == gameBoard[4] && gameBoard[4] == gameBoard[6]))
 	{
 		return 1;
 	}

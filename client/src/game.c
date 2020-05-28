@@ -1,4 +1,4 @@
-#include <Game.h>
+#include <game.h>
 
 void PrintScore(int player1Wins, int player2Wins, int draws, char *player1Name, char *player2Name)
 {
@@ -13,7 +13,7 @@ void PrintWinner(char *playerCharacter, char *player1Name, char *player2Name, in
 {
 	if(check == 1)
 	{
-		if(playerCharacter == 'X')
+		if(*playerCharacter == 'X')
 		{
 			printf("\n%s venceu!\n", player1Name);
 		}
@@ -126,7 +126,7 @@ void UpdateScores(int check, char *playerCharacter, int *player1Wins, int *playe
 {
 	if(check == 1)	//Verifica se algu�m venceu
 	{
-		if(playerCharacter == 'X')
+		if(*playerCharacter == 'X')
 		{
 			*player1Wins += 1;
 		}
@@ -157,10 +157,10 @@ void PlayGame(char *player1Name, char *player2Name, int numberOfPlayers)
   {
   	int win = 0;	//Controla se houve uma vit�ria (0 = false)
   	char character = 'X';	//Caractere do jogador atual
-  	char *playerCharacter = character;	//Ponteiro para a vari�vel do caractere do jogador
+  	char *playerCharacter = &character;	//Ponteiro para a vari�vel do caractere do jogador
   	
   	//Chamada da fun��o de quem define o jogo
-  	PlayerStart(&playerCharacter, &AITurn, numberOfPlayers, player1Name, player2Name);
+  	PlayerStart(playerCharacter, &AITurn, numberOfPlayers, player1Name, player2Name);
   	
   	//Defini��o do vetor inicial do jogo
   	char gameBoard[9] = {'1', '2', '3', '4', '5', '6', '7', '8', '9'};
@@ -172,7 +172,7 @@ void PlayGame(char *player1Name, char *player2Name, int numberOfPlayers)
   		if(AITurn == 1)
   		{
 		  	AIPlay(gameBoard, &chosenNumber);	//Chamada da fun��o que retorna a posi��o definida pelo computador
-  			gameBoard[chosenNumber - 1] = playerCharacter;	//Altera��o da posi��o no tabuleiro
+  			gameBoard[chosenNumber - 1] = *playerCharacter;	//Altera��o da posi��o no tabuleiro
   			AITurn = 0;	//Define que n�o � mais o turno do computador
   			
   			//Verifica se o computador venceu ou empatou (0 = nada, 1 = vit�ria, 2 = empate)
@@ -186,7 +186,7 @@ void PlayGame(char *player1Name, char *player2Name, int numberOfPlayers)
 		    	PrintWinner(playerCharacter, player1Name, player2Name, check);	//Informana tela se algu�m venceu ou empatou
 		    	continue;
 			}
-		    ChangePlayer(&playerCharacter);	//Muda o caractere para o do pr�ximo jogador
+		    ChangePlayer(playerCharacter);	//Muda o caractere para o do pr�ximo jogador
 		}
   		//Desenha o tabuleiro
     	DrawBoardWithNames(gameBoard, player1Name, player2Name, playerCharacter);
@@ -201,7 +201,7 @@ void PlayGame(char *player1Name, char *player2Name, int numberOfPlayers)
   		while(gameBoard[chosenNumber - 1] == 'X' || gameBoard[chosenNumber - 1] == 'O' || chosenNumber > 9 || chosenNumber <= 0);
   		
 		//Altera o valor no vetor do jogo
-		gameBoard[chosenNumber - 1] = playerCharacter;
+		gameBoard[chosenNumber - 1] = *playerCharacter;
 	    DrawBoardWithNames(gameBoard, player1Name, player2Name, playerCharacter);
 	    
 	    //Verifica se algum jogador venceu ou empatou (0 = nada, 1 = vit�ria, 2 = empate)
@@ -217,7 +217,7 @@ void PlayGame(char *player1Name, char *player2Name, int numberOfPlayers)
 		}
 	    
 	    //Altera o caractere do jogador
-	    ChangePlayer(&playerCharacter);
+	    ChangePlayer(playerCharacter);
 	    
 	    //Muda a vari�vel para o turno do computador, caso haja apenas 1 jogador
 	    if(numberOfPlayers == 1)
