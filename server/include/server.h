@@ -1,5 +1,6 @@
 #define TAM_MSG 1024
-#define MAX_LOGINS 5
+#define NRO_PARTIDAS_SIMULTANEAS 2
+#define MAX_LOGINS NRO_PARTIDAS_SIMULTANEAS*2
 
 #include <sys/types.h>
 #include <sys/socket.h>
