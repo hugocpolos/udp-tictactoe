@@ -106,6 +106,7 @@ int play_tictactoe(int socket, char *host, int port)
 	if (strcmp(m.data, "CHEIO") == 0)
 	{
 		printf("Já existe uma partida acontecendo. Tente mais tarde.\n");
+		sleep(5);
 		return 0;
 	}
 
