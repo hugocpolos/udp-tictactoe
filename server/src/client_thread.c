@@ -79,26 +79,36 @@ void *client_connection_thread(void *client_address)
     strcpy(p.name, m.data);
 
     /*
-    *   Verifica o número de jogadores conectados até o momento na partida atual. 
+    *   Busca por uma sala de jogo no servidor.
     *   Nesse ponto há 3 possibilidades:
-    *   - ESPERANDO: há apenas um jogador, e estamos esperando o outro
-    *   - PRONTO: 2 jogadores conectados, partida vai começar.
-    *   - CHEIO: Há 2 jogadores jogando.
+    *   - ESPERANDO: O jogador encontrou uma sala vazia e está esperando outro jogador.
+    *   - PRONTO: Entrou em uma sala com outro jogador.
+    *   - CHEIO: Todas salas de jogo estão cheias
     */
 
-    /* Verifica qual dos estados estamos */
+    /* Procura por uma sala de jogo.*/
     i = 0;
-    while(tictactoe[i].number_of_players == 2)
-    /* Percorre o array de partidas procurando um com menos de 2 jogadores */
+    /* Procura por alguma sala com alguém sozinho esperando */
+    while(tictactoe[i].number_of_players != 1 && i < NRO_PARTIDAS_SIMULTANEAS)
     {
         i++;
-        if (i == NRO_PARTIDAS_SIMULTANEAS)
+    }
+    if (i == NRO_PARTIDAS_SIMULTANEAS)
+    {
+        /* Não encontrou. Procura por uma sala vazia. */
+        i = 0;
+        while(tictactoe[i].number_of_players == 2)
+        /* Percorre o array de partidas procurando um com menos de 2 jogadores */
         {
-            /* Todas partidas estão cheias, informa o jogador */
-            strcpy(msg, "CHEIO");
-            send_message(socket, msg, p.addr);
-            close(socket);
-            return NULL;
+            i++;
+            if (i == NRO_PARTIDAS_SIMULTANEAS)
+            {
+                /* Todas partidas estão cheias, informa o jogador */
+                strcpy(msg, "CHEIO");
+                send_message(socket, msg, p.addr);
+                close(socket);
+                return NULL;
+            }
         }
     }
     
