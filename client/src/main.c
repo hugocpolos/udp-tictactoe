@@ -10,11 +10,12 @@ typedef enum opcao
 
 int main(){
 
-    Opcao op;	//Variavel que define a escolha do usu�rio
+    Opcao op;	//Variavel que define a escolha do usuario
 	int numberOfPlayers;
     int socket;
-	int login_server_port = 8080;
+	int login_server_port;
 	int game_server_port;
+    char game_server_ip[16];
 
     do
     {
@@ -33,18 +34,36 @@ int main(){
                 StartGame(numberOfPlayers);
                 break;
             case jogo_rede:
+                printf("Digite o ip do server: ");
+                if(scanf("%s", game_server_ip) != 1)
+                {
+                    printf("entrada invalida... \n");
+                    sleep(1);
+                    break;
+                }
+                printf("Digite a porta do server: ");
+                if(scanf("%d", &login_server_port) != 1)
+                {
+                    printf("entrada invalida... \n");
+                    sleep(1);
+                    break;
+                }
+                printf("conectando...\n");
+                clear_stdin();
+
                 srand(time(0));
                 socket = create_client_socket();
-                game_server_port = login(socket, "127.0.0.1", login_server_port);
+
+                game_server_port = login(socket, game_server_ip, login_server_port);
                 if (game_server_port == 0)
                 {
                     printf("Erro ao conectar ao servidor.\n");
                 }
                 else
                 {
-                    printf("porta de jogo: %d\n", game_server_port);
-                    play_tictactoe(socket, "127.0.0.1", game_server_port);
+                    play_tictactoe(socket, game_server_ip, game_server_port);
                 }                
+
                 break;
             case alterar:
                 numberOfPlayers = GetNumberOfPlayers();

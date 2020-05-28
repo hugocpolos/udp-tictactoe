@@ -106,7 +106,7 @@ void *client_connection_thread(void *client_address)
     /* Procura por uma sala de jogo.*/
     i = 0;
     /* Procura por alguma sala com alguém sozinho esperando */
-    while(tictactoe[i].number_of_players != 1 && i < NRO_PARTIDAS_SIMULTANEAS)
+    while(i < NRO_PARTIDAS_SIMULTANEAS && tictactoe[i].number_of_players != 1)
     {
         i++;
     }
