@@ -21,6 +21,7 @@
 /* the next two includes probably aren't relevant for you, but I typically use them all anyway */
 #include <math.h>
 #include <sys/termios.h>
+#include <menu.h>
 
 typedef struct messagem
 {
@@ -28,9 +29,10 @@ typedef struct messagem
     struct sockaddr_in client_addr;
 }Mensagem;
 
-int create_socket(void);
+int create_client_socket(void);
 int rand_range(int min, int max);
 Mensagem receive_message(int sockfd);
 int envia_mensagem(int socketfd, char *msg, char *host, int port);
 int login(int socket, char *host, int port);
 int play_tictactoe(int socket, char *host, int port);
+void clear_stdin(void);
