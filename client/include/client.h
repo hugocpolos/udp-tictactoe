@@ -35,3 +35,4 @@ Mensagem receive_message(int sockfd);
 int envia_mensagem(int socketfd, char *msg, char *host, int port);
 int login(int socket, char *host, int port);
 int play_tictactoe(int socket, char *host, int port);
+void clear_stdin(void);

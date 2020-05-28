@@ -151,6 +151,13 @@ int play_tictactoe(int socket, char *host, int port)
 	return 0;
 }
 
+void clear_stdin(void)
+{
+	int c;
+	while ((c = getchar()) != '\n' && c != EOF);
+}
+
+/*
 int main(int argc, char* argv[])
 {
 	int socket;
@@ -163,10 +170,8 @@ int main(int argc, char* argv[])
 
 	printf("porta de jogo: %d\n", game_server_port);
 
-	ShowMenu();
-
 	play_tictactoe(socket, "127.0.0.1", game_server_port);
 
 	close(socket);
-
 }
+*/

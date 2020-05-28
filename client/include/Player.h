@@ -3,7 +3,7 @@
 #include <string.h>
 
 //Muda o caractere do jogador atual
-void ChangePlayer(char playerCharacter);
+void ChangePlayer(char *playerCharacter);
 
 //Retorna o numero de jogadores escolhido pelo usuario (1 ou 2)
 int GetNumberOfPlayers();

@@ -3,20 +3,20 @@
 //Limpa o console e desenha o tabuleiro
 void DrawBoard(char gameBoard[9])
 {
-  if(!system("clear"))
+  if(system("clear") == 0)
   {
-  	printf(" %c | %c | %c ", gameBoard[0], gameBoard[1], gameBoard[2]);
-  	printf("\n----------\n");
-  	printf(" %c | %c | %c ", gameBoard[3], gameBoard[4], gameBoard[5]);
- 	printf("\n----------\n");
-  	printf(" %c | %c | %c ", gameBoard[6], gameBoard[7], gameBoard[8]);
+	printf(" %c | %c | %c ", gameBoard[0], gameBoard[1], gameBoard[2]);
+	printf("\n----------\n");
+	printf(" %c | %c | %c ", gameBoard[3], gameBoard[4], gameBoard[5]);
+	printf("\n----------\n");
+	printf(" %c | %c | %c ", gameBoard[6], gameBoard[7], gameBoard[8]);
   }
 }
 
 //Versão alternativa da função anterior, para caso seja necessário informar de qual jogador é a vez
-void DrawBoardWithNames(char gameBoard[9], char *player1Name, char *player2Name, char playerCharacter)
+void DrawBoardWithNames(char gameBoard[9], char *player1Name, char *player2Name, char *playerCharacter)
 {
-  if(!system("clear"))
+  if(system("clear") == 0)
   {
 	//Verifica quem está jogando e mostra o nome correspondente
 	if(playerCharacter == 'X')
@@ -27,7 +27,6 @@ void DrawBoardWithNames(char gameBoard[9], char *player1Name, char *player2Name,
 	{
 		printf("%s, sua vez\n\n", player2Name);
 	}
-	
 	printf(" %c | %c | %c ", gameBoard[0], gameBoard[1], gameBoard[2]);
 	printf("\n----------\n");
 	printf(" %c | %c | %c ", gameBoard[3], gameBoard[4], gameBoard[5]);
@@ -40,14 +39,14 @@ void DrawBoardWithNames(char gameBoard[9], char *player1Name, char *player2Name,
 int CheckPlayerWin(char gameBoard[9])
 {
 	//Verificação de todos os possíveis casos de vitória
-	if((gameBoard[0] == gameBoard[1] && gameBoard[1] == gameBoard[2])
-	|| (gameBoard[3] == gameBoard[4] && gameBoard[4] == gameBoard[5])
-	|| (gameBoard[6] == gameBoard[7] && gameBoard[7] == gameBoard[8])
-	|| (gameBoard[0] == gameBoard[3] && gameBoard[3] == gameBoard[6])
-	|| (gameBoard[1] == gameBoard[4] && gameBoard[4] == gameBoard[7])
-	|| (gameBoard[2] == gameBoard[5] && gameBoard[5] == gameBoard[8])
-	|| (gameBoard[0] == gameBoard[4] && gameBoard[4] == gameBoard[8])
-	|| (gameBoard[2] == gameBoard[4] && gameBoard[4] == gameBoard[6]))
+	if(gameBoard[0] == gameBoard[1] && gameBoard[1] == gameBoard[2]
+	|| gameBoard[3] == gameBoard[4] && gameBoard[4] == gameBoard[5]
+	|| gameBoard[6] == gameBoard[7] && gameBoard[7] == gameBoard[8]
+	|| gameBoard[0] == gameBoard[3] && gameBoard[3] == gameBoard[6]
+	|| gameBoard[1] == gameBoard[4] && gameBoard[4] == gameBoard[7]
+	|| gameBoard[2] == gameBoard[5] && gameBoard[5] == gameBoard[8]
+	|| gameBoard[0] == gameBoard[4] && gameBoard[4] == gameBoard[8]
+	|| gameBoard[2] == gameBoard[4] && gameBoard[4] == gameBoard[6])
 	{
 		return 1;
 	}

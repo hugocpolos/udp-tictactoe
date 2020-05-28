@@ -1,41 +1,36 @@
 #include <Player.h>
 
 //Muda o caractere do jogador atual
-void ChangePlayer(char playerCharacter)
+void ChangePlayer(char *playerCharacter)
 {
-    if(playerCharacter == 'X')
+    if(*playerCharacter == 'X')
     {
-      playerCharacter = 'O';
+      *playerCharacter = 'O';
     }
     else
     {
-     playerCharacter = 'X';
+     *playerCharacter = 'X';
     }
 }
 
 //Retorna o numero de jogadores escolhido pelo usuario (1 ou 2)
 int GetNumberOfPlayers()
-{	
+{
 	int numberOfPlayers;
-
-	system("clear");
-	
-	printf("Quantos jogadores irao participar? ");
-	scanf("%d", &numberOfPlayers);
-
-	switch (numberOfPlayers)
+	do	//Controle para que o usu�rio d� uma resposta v�lida
 	{
-	case 1:
-		return numberOfPlayers;
-		break;
-	case 2:
-		return numberOfPlayers;
-		break;
-	default:
-		return 0;
-		break;
+		printf("Quantos jogadores irao participar?\n");
+		if(scanf("%d", &numberOfPlayers)==1)
+		{
+			if(numberOfPlayers <= 0 || numberOfPlayers > 2)
+			{
+				printf("Por favor insira um numero valido de jogadores (1 ou 2).\n");
+			}
+		}
 	}
-
+	while(numberOfPlayers <= 0 || numberOfPlayers > 2);
+	
+	return numberOfPlayers;
 }
 
 //Define o nome do jogador (O par�metro de n�mero de jogadores define qual a mensagem mostrada no console e informa qual jogador deve informar o nome)
@@ -51,12 +46,12 @@ char* GetPlayerName(int playerNumber)	//Caso seja contra o computador, playerNum
 	{
 		printf("Digite o nome do jogador %d: ", playerNumber);
 	}
-	if(scanf("%[^\n]s", temp) == 1)
+	if(scanf(" %[^\n]s", temp)==1)
 	{
 		playerName = calloc(strlen(temp), sizeof(char));	//Aloca apenas a mem�ria necess�ria para suportar o nome do jogador
 		strcpy(playerName, temp);	//Copia o conte�do de temp para a vari�vel que ir� retornar
 		free(temp);	//Libera a mem�ria alocada na linha 35
 	}
-	
+
 	return playerName;
 }

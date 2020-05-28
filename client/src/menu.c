@@ -1,39 +1,45 @@
 #include <Menu.h>
+#include <client.h>
 
 //Mostra o menu
 void ShowMenu()
 {
-	int choice = 0;	//Variavel que define a escolha do usuario
-	int numberOfPlayers = GetNumberOfPlayers();	//Define o numero de jogadores participantes
-	if(numberOfPlayers == 0)
+	if(system("clear")==0)
 	{
-		printf("Por favor insira um numero valido de jogadores (1 ou 2).\n");
-		ShowMenu();
+		printf("Menu");
+		printf("\n1 - Jogar");
+		printf("\n2 - Jogar em lan");
+		printf("\n3 - Alterar numero de jogadores");
+		printf("\n4 - Sair\n");
 	}
+}
 
-	getchar();
-	printf("Menu");
-	printf("\n1 - Jogar");
-	printf("\n2 - Alterar numero de jogadores");
-	printf("\n3 - Sair\n");
-	
-	if(scanf("%d", &choice)==1)
+//Chama a fun��o escolhida pelo jogador
+void MenuChoice(int choice, int *numberOfPlayers)
+{
+	int socket;
+	int login_server_port = 8080;
+	int game_server_port;
+
+	switch(choice)
 	{
-		switch(choice)
-		{
-			case 1:
-				StartGame(numberOfPlayers);
-				break;
-			case 2:
-				numberOfPlayers = GetNumberOfPlayers();
-				break;
-			case 3:
-				exit(0);
-				break;
-			default:
-				printf("Escolha uma opcao valida.\n");
-				ShowMenu();
-				break;
-		}
+		case 1:
+			StartGame(*numberOfPlayers);
+			break;
+		case 2:
+			srand(time(0));
+			socket = create_client_socket();
+			game_server_port = login(socket, "127.0.0.1", login_server_port);
+
+			printf("porta de jogo: %d\n", game_server_port);
+
+			play_tictactoe(socket, "127.0.0.1", game_server_port);
+			break;
+		case 3:
+			*numberOfPlayers = GetNumberOfPlayers();
+			break;
+		case 4:
+			exit(0);
+			break;
 	}
 }
