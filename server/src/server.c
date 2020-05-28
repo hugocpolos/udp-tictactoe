@@ -1,45 +1,9 @@
 #include <server.h>
+#include <client_thread.h>
 
 int rand_range(int min, int max)
 {
 	return min + rand()%(max - min + 1);	
-}
-
-void *client_connection(void *client_address)
-{
-    Mensagem m;
-    int socket;
-    Player p;
-    char msg[1024];
-    int client_port;
-    Sockaddr *address_rcv = (Sockaddr *)client_address;
-
-    /* cria novo socket para comunicação dedicada com esse cliente */
-    client_port = rand_range(20000,64000);
-    socket = create_socket(client_port);
-
-    /* armazena em msg a porta como string, para ser enviada ao cliente */
-    sprintf(msg,"%d", client_port);
-    
-    send_message(socket, msg, *address_rcv);
-
-    /* Espera pelo nome do cliente */
-    m = receive_message(socket);
-
-    printf("%s", m.data);
-
-    strcpy(p.name, m.data);
-
-    printf("client connected.\n");
-    do
-    {
-        m=receive_message(socket);
-        printf("%s: %s\n", p.name, m.data);
-    }while(strcmp(m.data, "exit"));
-    printf("client disconneted.\n");
-
-    close(socket);
-    return NULL;
 }
 
 int create_socket(int port)
@@ -97,29 +61,56 @@ int wait_for_login( void )
     Mensagem m;
 
     // aloca memória para as threads
-    client_threads = malloc(sizeof(pthread_t));
+    client_threads = malloc(MAX_LOGINS * sizeof(pthread_t));
 
     // inicia o socket de login
     socket = create_socket(8080);
 
+    printf("Aguardando a conexão de jogadores.\n");
     while (42)
     {
         m = receive_message(socket);
         if(strcmp(m.data, "LOGIN") == 0)
         {
-            /* novo login */
-            if(pthread_create(client_threads, NULL, client_connection, &m.client_addr))
+            printf("Nova conexão.\n");
+            if(conn_clients > MAX_LOGINS)
             {
-                printf("erro criando thread.\n");
+                printf("falha no login, numero maximo de clientes conectados.\n");
             }
-            conn_clients++;
+            else
+            {
+                /* novo login */
+                if(pthread_create(&client_threads[conn_clients], NULL, client_connection_thread, &m.client_addr))
+                {
+                    printf("erro criando thread.\n");
+                    printf("falha no login,\n");
+                }
+                conn_clients++;
+            }
         }
     }
     close(socket);
 }
 
-int main()
+int init_server(void)
 {
     srand(time(0));
+    return 0;
+}
+
+int main()
+{
+    if(init_server())
+    {
+        printf("falha ao inicializar o servidor.\n");
+        return 1;
+    }
+    if (init_shared_variables())
+    {
+        printf("falha ao inicializar o servidor.\n");
+        return 1;
+    }
+    printf("servidor inicializado.\n");
     wait_for_login();
+    return 0;
 }

@@ -1,4 +1,7 @@
 #define TAM_MSG 1024
+#define NRO_PARTIDAS_SIMULTANEAS 2
+#define MAX_LOGINS NRO_PARTIDAS_SIMULTANEAS*2
+
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
@@ -23,6 +26,8 @@
 #include <math.h>
 #include <sys/termios.h>
 
+typedef struct sockaddr_in Sockaddr;
+
 typedef struct messagem
 {
     char data[TAM_MSG];
@@ -31,8 +36,17 @@ typedef struct messagem
 
 typedef struct player
 {
+    unsigned short id;
     char name[64];
+    Sockaddr addr;
 }Player;
+
+typedef struct game
+{
+    Player players[2];
+    unsigned short number_of_players;
+    int first_player;
+}Game;
 
 int create_socket(int port);
 Mensagem receive_message(int sockfd);
@@ -40,5 +54,6 @@ int rand_range(int min, int max);
 void *client_connection(void *arg);
 void send_message(int socket, char *msg, struct sockaddr_in client_addr);
 int wait_for_login( void );
+int init_server(void);
 
-typedef struct sockaddr_in Sockaddr;
+

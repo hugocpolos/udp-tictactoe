@@ -85,6 +85,7 @@ int login(int socket, char *host, int port)
 int play_tictactoe(int socket, char *host, int port)
 {
 	char msg[1024];
+	Mensagem m;
 
 	/* envia o nome do jogador para o servidor: */
 	printf("Nome do jogador: ");
@@ -94,17 +95,60 @@ int play_tictactoe(int socket, char *host, int port)
 	}
 	envia_mensagem(socket, msg, host, port);
 
+	/* Espera pelo estado da partida */
+	m = receive_message(socket);
 
-	printf("enter 'exit' to quit\n");
-	do
+	if (strcmp(m.data, "CHEIO") == 0)
 	{
-		printf("> ");
-		if (fgets(msg, sizeof msg, stdin)) {
-			msg[strcspn(msg, "\n")] = '\0';
-		}
-		envia_mensagem(socket, msg, host, port);
+		printf("Já existe uma partida acontecendo. Tente mais tarde.\n");
+		return 0;
 	}
-	while(strcmp(msg, "exit"));
+
+	if (strcmp(m.data, "ESPERANDO") == 0 )
+	{
+		printf("Conectado. Aguardando outro jogador.\n");
+	}
+
+	if (strcmp(m.data, "PRONTO") == 0)
+	{
+		printf("Partida pronta. O jogo vai começar em breve.\n");
+	}
+
+	/* espera pela indicação de que o jogo começou, assim como a ordem dos turnos*/
+	m = receive_message(socket);
+	printf("%s\n", m.data);
+
+	if(strcmp(m.data, "FIRST") == 0)
+	{
+		while (1)
+		{
+			printf("qual sua jogada?");
+			if (fgets(msg, sizeof msg, stdin)) {
+				msg[strcspn(msg, "\n")] = '\0';
+			}
+			envia_mensagem(socket, msg, host, port);
+
+			/* espera jogada */
+			m = receive_message(socket);
+			printf("jogada: %s\n", m.data);
+		}
+	}
+	else if (strcmp(m.data, "SECOND") == 0)
+	{
+		while (1)
+		{
+			/* espera jogada */
+			m = receive_message(socket);
+			printf("jogada: %s\n", m.data);
+
+			printf("qual sua jogada?");
+			if (fgets(msg, sizeof msg, stdin)) {
+				msg[strcspn(msg, "\n")] = '\0';
+			}
+			envia_mensagem(socket, msg, host, port);
+		}
+	}
+
 	return 0;
 }
 

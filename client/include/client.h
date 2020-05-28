@@ -30,3 +30,7 @@ typedef struct messagem
 
 int create_socket(void);
 int rand_range(int min, int max);
+Mensagem receive_message(int sockfd);
+int envia_mensagem(int socketfd, char *msg, char *host, int port);
+int login(int socket, char *host, int port);
+int play_tictactoe(int socket, char *host, int port);
