@@ -30,6 +30,8 @@ void start_remote_tictactoe_game(int socket, Player p, unsigned short game_id)
 {
     Mensagem m;
     char msg[TAM_JOGADA];
+    int outro_jogador = 1 - p.id;
+
     while ( strcmp(m.data, "VENCEDOR") && strcmp(m.data, "PERDEDOR") )
     {
         /* Espera jogada */
@@ -37,8 +39,9 @@ void start_remote_tictactoe_game(int socket, Player p, unsigned short game_id)
         sprintf(msg, "%s: %s", p.name, m.data);
 
         /* Envia jogada para o outro jogador */
-        send_message(socket, msg, tictactoe[game_id].players[1-p.id].addr);
+        send_message(socket, msg, tictactoe[game_id].players[outro_jogador].addr);
     }
+
     pthread_mutex_lock(&lock);
     tictactoe[game_id].number_of_players = 0;
     pthread_mutex_unlock(&lock);
@@ -99,10 +102,12 @@ void *client_connection_thread(void *client_address)
         }
     }
     
+    /* Encontrou uma partida com espaço livre, a partida tem indice igual a i */
     /* insere o jogador na partida */
     pthread_mutex_lock(&lock);
+    p.id = tictactoe[i].number_of_players;
     tictactoe[i].players[tictactoe[i].number_of_players] = p;
-    p.id = tictactoe[i].number_of_players++;
+    tictactoe[i].number_of_players++;
     pthread_mutex_unlock(&lock);
 
     /* envia o estado atual para o jogador */
