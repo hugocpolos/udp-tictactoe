@@ -36,10 +36,15 @@ int main(){
                 srand(time(0));
                 socket = create_client_socket();
                 game_server_port = login(socket, "127.0.0.1", login_server_port);
-
-                printf("porta de jogo: %d\n", game_server_port);
-
-                play_tictactoe(socket, "127.0.0.1", game_server_port);
+                if (game_server_port == 0)
+                {
+                    printf("Erro ao conectar ao servidor.\n");
+                }
+                else
+                {
+                    printf("porta de jogo: %d\n", game_server_port);
+                    play_tictactoe(socket, "127.0.0.1", game_server_port);
+                }                
                 break;
             case alterar:
                 numberOfPlayers = GetNumberOfPlayers();
