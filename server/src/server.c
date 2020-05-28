@@ -53,7 +53,7 @@ void send_message(int socket, char *msg, struct sockaddr_in client_addr)
             sizeof(client_addr));
 }
 
-int wait_for_login( void )
+int wait_for_login( int port )
 {
     int socket;
     int conn_clients = 0;
@@ -64,7 +64,7 @@ int wait_for_login( void )
     client_threads = malloc(MAX_LOGINS * sizeof(pthread_t));
 
     // inicia o socket de login
-    socket = create_socket(8080);
+    socket = create_socket(port);
 
     printf("Aguardando a conexão de jogadores.\n");
     while (42)
@@ -98,8 +98,27 @@ int init_server(void)
     return 0;
 }
 
-int main()
+void show_usage (char *bin_name)
 {
+    printf("usage: %s <int: port>\n", bin_name);
+}
+
+int main(int argc, char **argv)
+{
+    int server_port;
+    if (argc != 2)
+    {
+        show_usage(argv[0]);
+        return 1;
+    }
+    
+    server_port = atoi(argv[1]);
+    if (server_port == 0)
+    {
+        show_usage(argv[0]);
+        return 1;
+    }
+
     if(init_server())
     {
         printf("falha ao inicializar o servidor.\n");
@@ -111,6 +130,6 @@ int main()
         return 1;
     }
     printf("servidor inicializado.\n");
-    wait_for_login();
+    wait_for_login(server_port);
     return 0;
 }

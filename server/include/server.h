@@ -53,7 +53,7 @@ Mensagem receive_message(int sockfd);
 int rand_range(int min, int max);
 void *client_connection(void *arg);
 void send_message(int socket, char *msg, struct sockaddr_in client_addr);
-int wait_for_login( void );
+int wait_for_login( int port );
 int init_server(void);
 
 
