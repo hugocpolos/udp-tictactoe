@@ -50,9 +50,11 @@ Mensagem receive_message(int sockfd)
 int envia_mensagem(int socketfd, char *msg, char *host, int port)
 {
 	struct sockaddr_in hostaddr;
+	in_addr_t dest_addr = inet_addr(host);
+
 	hostaddr.sin_family = AF_INET; 
     hostaddr.sin_port = htons(port); 
-    hostaddr.sin_addr.s_addr = INADDR_ANY;
+    hostaddr.sin_addr.s_addr = dest_addr;
 
 	sendto(socketfd, (const char *)msg, strlen(msg), 
         MSG_CONFIRM, (const struct sockaddr *) &hostaddr,  
