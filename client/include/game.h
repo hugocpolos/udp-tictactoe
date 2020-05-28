@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <time.h>
-#include <Player.h>
-#include <Board.h>
+#include <player.h>
+#include <board.h>
 
 //Escreve a pontuacao atual dos jogadores na tela
 void PrintScore(int player1Wins, int player2Wins, int draws, char *player1Name, char *player2Name);
