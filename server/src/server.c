@@ -53,18 +53,15 @@ void send_message(int socket, char *msg, struct sockaddr_in client_addr)
             sizeof(client_addr));
 }
 
-int wait_for_login( void )
+int wait_for_login( int port )
 {
     int socket;
     int conn_clients = 0;
-    pthread_t *client_threads;
+    pthread_t client_thread;
     Mensagem m;
 
-    // aloca memória para as threads
-    client_threads = malloc(MAX_LOGINS * sizeof(pthread_t));
-
     // inicia o socket de login
-    socket = create_socket(8080);
+    socket = create_socket(port);
 
     printf("Aguardando a conexão de jogadores.\n");
     while (42)
@@ -73,20 +70,14 @@ int wait_for_login( void )
         if(strcmp(m.data, "LOGIN") == 0)
         {
             printf("Nova conexão.\n");
-            if(conn_clients > MAX_LOGINS)
+
+            /* novo login */
+            if(pthread_create(&client_thread, NULL, client_connection_thread, &m.client_addr))
             {
-                printf("falha no login, numero maximo de clientes conectados.\n");
+                printf("erro criando thread.\n");
+                printf("falha no login,\n");
             }
-            else
-            {
-                /* novo login */
-                if(pthread_create(&client_threads[conn_clients], NULL, client_connection_thread, &m.client_addr))
-                {
-                    printf("erro criando thread.\n");
-                    printf("falha no login,\n");
-                }
-                conn_clients++;
-            }
+            conn_clients++;
         }
     }
     close(socket);
@@ -98,8 +89,27 @@ int init_server(void)
     return 0;
 }
 
-int main()
+void show_usage (char *bin_name)
 {
+    printf("usage: %s <int: port>\n", bin_name);
+}
+
+int main(int argc, char **argv)
+{
+    int server_port;
+    if (argc != 2)
+    {
+        show_usage(argv[0]);
+        return 1;
+    }
+    
+    server_port = atoi(argv[1]);
+    if (server_port == 0)
+    {
+        show_usage(argv[0]);
+        return 1;
+    }
+
     if(init_server())
     {
         printf("falha ao inicializar o servidor.\n");
@@ -111,6 +121,6 @@ int main()
         return 1;
     }
     printf("servidor inicializado.\n");
-    wait_for_login();
+    wait_for_login(server_port);
     return 0;
 }
