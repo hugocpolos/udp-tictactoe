@@ -9,7 +9,6 @@ void ShowMenu()
 		printf("Menu");
 		printf("\n1 - Jogar");
 		printf("\n2 - Jogar em lan");
-		printf("\n3 - Alterar numero de jogadores");
-		printf("\n4 - Sair\n");
+		printf("\n3 - Sair\n");
 	}
 }

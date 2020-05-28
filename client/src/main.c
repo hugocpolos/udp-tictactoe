@@ -5,7 +5,7 @@
 
 typedef enum opcao
 {
-    jogo_local = 1, jogo_rede = 2, alterar = 3, sair = 4
+    jogo_local = 1, jogo_rede, sair
 }Opcao;
 
 int main(){
@@ -64,10 +64,7 @@ int main(){
                     play_tictactoe(socket, game_server_ip, game_server_port);
                 }                
 
-                break;
-            case alterar:
-                numberOfPlayers = GetNumberOfPlayers();
-                break;                
+                break;            
             case sair:
                 printf("Encerrando...\n");
                 break;

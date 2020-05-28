@@ -159,6 +159,7 @@ int play_tictactoe(int socket, char *host, int port)
 	{
 		DrawBoard(gameBoard);
 
+		printf("\naguardando jogada de %s\n", playerTwoName);
 		/* espera jogada */
 		m = receive_message(socket);
 		printf("\njogada: %s\n", m.data);
@@ -167,6 +168,7 @@ int play_tictactoe(int socket, char *host, int port)
 
 		if(CheckPlayerWin(gameBoard) == 1)
 		{
+			DrawBoard(gameBoard);
 			printf("\n%s ganhou\n", playerTwoName);
 			printf("desconectando...\n");
 			disconnect(socket,host,port);
@@ -176,6 +178,7 @@ int play_tictactoe(int socket, char *host, int port)
 		}
 		else if(CheckPlayerWin(gameBoard) == 2)
 		{
+			DrawBoard(gameBoard);
 			printf("Voce e \n%s empataram\n", playerTwoName);
 			printf("desconectando...\n");
 			disconnect(socket,host,port);
@@ -209,6 +212,7 @@ int play_tictactoe(int socket, char *host, int port)
 
 		if(CheckPlayerWin(gameBoard) == 1)
 		{
+			DrawBoard(gameBoard);
 			printf("\nVoce ganhou de %s\n", playerTwoName);
 			printf("desconectando...\n");
 			disconnect(socket,host,port);
@@ -218,6 +222,7 @@ int play_tictactoe(int socket, char *host, int port)
 		}
 		else if(CheckPlayerWin(gameBoard) == 2)
 		{
+			DrawBoard(gameBoard);
 			printf("Voce e \n%s empataram\n", playerTwoName);
 			printf("desconectando...\n");
 			disconnect(socket,host,port);
