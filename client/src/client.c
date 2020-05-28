@@ -1,4 +1,5 @@
 #include <client.h>
+#include <board.h>
 
 int create_client_socket(void)
 {
@@ -85,6 +86,11 @@ int play_tictactoe(int socket, char *host, int port)
 {
 	char msg[1024];
 	Mensagem m;
+	char gameBoard[9] = {'1','2','3','4','5','6','7','8','9'};
+	char playerCharacter = 'O';
+	char playerTwoCharacter = 'X';
+	int invalid = 0;
+	char playerTwoName[64];
 
 	/* envia o nome do jogador para o servidor: */
 	printf("Nome do jogador: ");
@@ -113,38 +119,110 @@ int play_tictactoe(int socket, char *host, int port)
 		printf("Partida pronta. O jogo vai começar em breve.\n");
 	}
 
+	/* recebe o nome do inimigo */
+	m = receive_message(socket);
+	strcpy(playerTwoName, m.data);
+	
 	/* espera pela indicação de que o jogo começou, assim como a ordem dos turnos*/
 	m = receive_message(socket);
 	printf("%s\n", m.data);
 
 	if(strcmp(m.data, "FIRST") == 0)
 	{
-		while (1)
+		playerCharacter = 'X';
+		playerTwoCharacter = 'O';
+
+		do
 		{
-			printf("qual sua jogada?");
+			DrawBoard(gameBoard);
+			if(invalid)
+			{
+				printf("\njogada invalida");
+			}
+			
+			invalid = 1;
+
+			printf("\nqual sua jogada?");
 			if (fgets(msg, sizeof msg, stdin)) {
 				msg[strcspn(msg, "\n")] = '\0';
 			}
-			envia_mensagem(socket, msg, host, port);
 
-			/* espera jogada */
-			m = receive_message(socket);
-			printf("jogada: %s\n", m.data);
-		}
+		}while(checkValidPlay(gameBoard, atoi(msg)) == 0);
+
+		gameBoard[atoi(msg) - 1] = playerCharacter;
+
+		envia_mensagem(socket, msg, host, port);
 	}
-	else if (strcmp(m.data, "SECOND") == 0)
-	{
-		while (1)
-		{
-			/* espera jogada */
-			m = receive_message(socket);
-			printf("jogada: %s\n", m.data);
 
-			printf("qual sua jogada?");
+	while (1)
+	{
+		DrawBoard(gameBoard);
+
+		/* espera jogada */
+		m = receive_message(socket);
+		printf("\njogada: %s\n", m.data);
+
+		gameBoard[atoi(m.data) - 1] = playerTwoCharacter;
+
+		if(CheckPlayerWin(gameBoard) == 1)
+		{
+			printf("\n%s ganhou\n", playerTwoName);
+			printf("desconectando...\n");
+			disconnect(socket,host,port);
+			sleep(5);
+
+			return 0;
+		}
+		else if(CheckPlayerWin(gameBoard) == 2)
+		{
+			printf("Voce e \n%s empataram\n", playerTwoName);
+			printf("desconectando...\n");
+			disconnect(socket,host,port);
+			sleep(5);
+			
+			return 0;
+		}
+
+		invalid = 0;
+
+		do
+		{
+			DrawBoard(gameBoard);
+			/* Verificar se houve vencedor */
+			if(invalid)
+			{
+				printf("\njogada invalida");
+			}
+			
+			invalid = 1;
+			
+			printf("\nqual sua jogada?");
 			if (fgets(msg, sizeof msg, stdin)) {
 				msg[strcspn(msg, "\n")] = '\0';
 			}
-			envia_mensagem(socket, msg, host, port);
+		}while(checkValidPlay(gameBoard, atoi(msg)) == 0);
+
+		gameBoard[atoi(msg) - 1] = playerCharacter;
+
+		envia_mensagem(socket, msg, host, port);
+
+		if(CheckPlayerWin(gameBoard) == 1)
+		{
+			printf("\nVoce ganhou de %s\n", playerTwoName);
+			printf("desconectando...\n");
+			disconnect(socket,host,port);
+			sleep(5);
+			
+			return 0;
+		}
+		else if(CheckPlayerWin(gameBoard) == 2)
+		{
+			printf("Voce e \n%s empataram\n", playerTwoName);
+			printf("desconectando...\n");
+			disconnect(socket,host,port);
+			sleep(5);
+			
+			return 0;
 		}
 	}
 
@@ -157,21 +235,9 @@ void clear_stdin(void)
 	while ((c = getchar()) != '\n' && c != EOF);
 }
 
-/*
-int main(int argc, char* argv[])
+void disconnect(int socket, char *host, int port)
 {
-	int socket;
-	int login_server_port = 8080;
-	int game_server_port;
-
-	srand(time(0));
-	socket = create_client_socket();
-	game_server_port = login(socket, "127.0.0.1", login_server_port);
-
-	printf("porta de jogo: %d\n", game_server_port);
-
-	play_tictactoe(socket, "127.0.0.1", game_server_port);
-
-	close(socket);
+	char msg[64];
+	strcpy(msg,"FIM");
+	envia_mensagem(socket, msg, host, port);
 }
-*/
