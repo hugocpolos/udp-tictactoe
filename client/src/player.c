@@ -1,4 +1,4 @@
-#include <Player.h>
+#include <player.h>
 
 //Muda o caractere do jogador atual
 void ChangePlayer(char *playerCharacter)
@@ -51,6 +51,10 @@ char* GetPlayerName(int playerNumber)	//Caso seja contra o computador, playerNum
 		playerName = calloc(strlen(temp), sizeof(char));	//Aloca apenas a mem�ria necess�ria para suportar o nome do jogador
 		strcpy(playerName, temp);	//Copia o conte�do de temp para a vari�vel que ir� retornar
 		free(temp);	//Libera a mem�ria alocada na linha 35
+	}
+	else
+	{
+		playerName = NULL;
 	}
 
 	return playerName;
