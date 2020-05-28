@@ -64,9 +64,21 @@ void *client_connection_thread(void *client_address)
 
     /* cria novo socket para comunicação dedicada com esse cliente */
     /* Sorteia uma porta e abre um socket com bind nessa porta */
-    client_port = rand_range(20000,64000);
-    socket = create_socket(client_port);
+    /* Por envolver sorteio, em caso de repetição realiza o procedimento até 3 vezes */
+    i = 0;
+    do
+    {
+        client_port = rand_range(20000,64000);
+        socket = create_socket(client_port);
+        i++;
+    }while(socket == -1 && i < 3);
 
+    if (socket == -1)
+    {
+        printf("Erro ao alocar porta para o cliente, finalizando conexão.");
+        strcpy(msg, "ERRO");
+        return NULL;
+    }
     /* armazena a porta como string, para ser enviada ao cliente */
     sprintf(msg,"%d", client_port);
     

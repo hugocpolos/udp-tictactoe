@@ -14,7 +14,7 @@ int create_socket(int port)
     // Creating socket file descriptor
     if ( (sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0 ) {
         perror("socket creation failed");
-        exit(EXIT_FAILURE);
+        return -1;
     }
       
     memset(&servaddr, 0, sizeof(servaddr)); 
@@ -62,6 +62,11 @@ int wait_for_login( int port )
 
     // inicia o socket de login
     socket = create_socket(port);
+
+    if (socket == -1)
+    {
+        exit(EXIT_FAILURE);
+    }
 
     printf("Aguardando a conexão de jogadores.\n");
     while (42)
