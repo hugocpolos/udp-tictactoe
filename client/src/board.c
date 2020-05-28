@@ -10,6 +10,7 @@ void DrawBoard(char gameBoard[9])
 	printf(" %c | %c | %c ", gameBoard[3], gameBoard[4], gameBoard[5]);
 	printf("\n----------\n");
 	printf(" %c | %c | %c ", gameBoard[6], gameBoard[7], gameBoard[8]);
+	printf("\n");
   }
 }
 
@@ -33,6 +34,12 @@ void DrawBoardWithNames(char gameBoard[9], char *player1Name, char *player2Name,
 	printf("\n----------\n");
 	printf(" %c | %c | %c ", gameBoard[6], gameBoard[7], gameBoard[8]);
   }
+}
+
+/**/
+int checkValidPlay(char *gameBoard, int position)
+{
+	return !(gameBoard[position - 1] == 'X' || gameBoard[position - 1] == 'O' || position > 9 || position <= 0);
 }
 
 //Verifica se houve uma vitoria (1), empate (2) ou se o jogo continua (0)
