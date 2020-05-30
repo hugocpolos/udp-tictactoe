@@ -12,3 +12,5 @@ int CheckPlayerWin(char gameBoard[9]);
 
 
 int checkValidPlay(char *gameBoard, int position);
+
+void clear_screen( void );
