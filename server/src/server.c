@@ -123,7 +123,7 @@ void show_usage (char *bin_name)
  * 
  * Após isso, a função main realiza a inicialização do servidor chamando as funções
  * @c init_server e @c init_shared_variables , cria um socket e inicia a espera por logins através
- * da função @wait_for_login
+ * da função @c wait_for_login
  * 
  * Caso os parâmetros sejam válidos
  * 

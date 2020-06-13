@@ -14,6 +14,7 @@
 #define TAM_MSG 1024
 #define NRO_PARTIDAS_SIMULTANEAS 1000 
 #define RANKING_FILENAME "ranking.dat"
+#define RANKING_LEN 200
 
 #include <netinet/in.h>
 #include <unistd.h>
@@ -72,6 +73,29 @@ typedef struct game
     unsigned short number_of_players; /**< Armazena o número de jogadores conectados a essa partida. */
     int first_player; /**< Armazena o id do jogador que começará/começou jogando essa partida. */
 }Game;
+
+/**
+ * @brief Entrada na lista do ranking.
+ *
+ * Estrutura que contém as informações de um item dentro da lista que compoõe o ranking.
+ * Armazena um jogador, e a sua pontuação correspondente.
+ */
+typedef struct ranking_entry
+{
+    Player p;
+    unsigned int score;
+}RankingEntry;
+
+/**
+ * @brief Ranking do servidor
+ * 
+ * Estrutura que mantém uma lista com todas as entradas do ranking.
+ *
+ */
+typedef struct ranking
+{
+    RankingEntry r[RANKING_LEN];
+}Ranking;
 
 /**
  * @brief Cria um socket udp

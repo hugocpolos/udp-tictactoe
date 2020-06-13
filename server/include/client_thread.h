@@ -13,6 +13,22 @@
 #define TAM_JOGADA 1089
 
 /**
+ * @brief possiveis resultados de uma partida para um jogador.
+ *
+ * Enumeração que lista as 3 possibilidades de um final de partida para um jogador (vitório, derrota e empate) e a
+ * pontuação correspondente.
+ * essa enumeração é utilizada ao final de cada partida para atualizar o ranking do servidor.
+ *
+ * @typedef Resultado
+ */
+typedef enum result
+{
+    victory = 3,
+    defeat = 0,
+    draw = 1
+}Result;
+
+/**
  * @brief Inicializa as variáveis compartilhadas.
  *
  * Essa função inicializa as variáveis que são compartilhadas entre as threads
@@ -162,3 +178,6 @@ void wait_all_players_to_connect(int game_id);
  * @return Não há retorno.
  */
 void leave_game(int game_id);
+
+
+void update_ranking(Player p, Result r);

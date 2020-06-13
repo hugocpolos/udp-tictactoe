@@ -44,9 +44,18 @@ void leave_game(int game_id)
     pthread_mutex_unlock(&lock);
 }
 
+void update_ranking(Player p, Result r)
+{
+    int number_of_points = (int)r;
+    pthread_mutex_lock(&lock);
+    printf("%s. %d points\n", p.name, number_of_points);
+    pthread_mutex_unlock(&lock);
+}
+
 void start_remote_tictactoe_game(int socket, Player p, unsigned short game_id)
 {
     ReceivedMessage m;
+    Result r;
     int outro_jogador = 1 - p.id;
 
     while ( strcmp(m.data, "FIM"))
@@ -58,7 +67,9 @@ void start_remote_tictactoe_game(int socket, Player p, unsigned short game_id)
         send_message(socket, m.data, tictactoe[game_id].players[outro_jogador].addr);
     }
 
+    r = victory;
     leave_game(game_id);
+    update_ranking(p, r);
     printf("Jogador %s saiu.\n", p.name);
     printf("Finalizando partida %i\n", game_id);
     return;
