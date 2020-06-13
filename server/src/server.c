@@ -88,7 +88,14 @@ void wait_for_login( int socket )
 
 int init_server(void)
 {
+    FILE *ranking;
+
+    /* Inicializa o gerador de números aleatórios */
     srand(time(0));
+
+    /* Cria, se ainda não existir, o arquivo que guarda o ranking */
+    ranking = fopen(RANKING_FILENAME, "a+b");
+    fclose(ranking);
     return 0;
 }
 /// @endcond

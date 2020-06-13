@@ -13,7 +13,7 @@
 
 #define TAM_MSG 1024
 #define NRO_PARTIDAS_SIMULTANEAS 1000 
-
+#define RANKING_FILENAME "ranking.dat"
 
 #include <netinet/in.h>
 #include <unistd.h>
@@ -214,7 +214,8 @@ void wait_for_login( int socket );
  * Essa função é destinada a guardar todas as instruções que devem ser executadas no
  * inicio do programa.
  * Atualmente, ela inicializa o sistema de geração de números aleatórios, para que cada execução
- * do servidor disponha de valores aleatórios diferentes.
+ * do servidor disponha de valores aleatórios diferentes e, também, inicializa o sistema de ranking
+ * criando, se for necessário, o arquivo de armazenamento do ranking.
  * 
  * @return Não há retorno.
  * 
