@@ -152,6 +152,16 @@ int insert_player_in_game(Player p, int game_id);
  */
 void wait_all_players_to_connect(int game_id);
 
+/**
+ * @brief Cria um arquivo com o nome dos vencedores. 
+ *
+ * Cria um novo arquivo ou abre um ja existente e escreve o nome do vencedor da partida.
+ * 
+ * @param msg nome do jogador vencedor  
+ * @return Não há retorno.
+ * 
+ */
+void write_in_file_ranking(char *msg);
 
 /**
  * @brief Abandona uma partida

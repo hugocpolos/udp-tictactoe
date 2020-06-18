@@ -58,9 +58,13 @@ void start_remote_tictactoe_game(int socket, Player p, unsigned short game_id)
         send_message(socket, m.data, tictactoe[game_id].players[outro_jogador].addr);
     }
 
+    m = receive_message(socket);
+    write_in_file_ranking(m.data);
+
     leave_game(game_id);
     printf("Jogador %s saiu.\n", p.name);
     printf("Finalizando partida %i\n", game_id);
+
     return;
 }
 
@@ -104,6 +108,28 @@ void wait_all_players_to_connect(int game_id)
     {
         sleep(1);
     }
+}
+
+void send_file_ranking()
+{
+
+}
+
+void write_in_file_ranking(char *msg){
+    FILE *arq;
+    int result;
+    arq = fopen("ranking.txt", "a+"); // Cria um arquivo texto para gravação
+    if (arq == NULL) // Se não conseguiu criar
+    {
+        printf("Problemas na CRIACAO do arquivo\n");
+        return;
+    }
+    result = fprintf(arq,"%s - %i\n",msg, 1); 
+    if (result == EOF)
+    {
+        printf("Erro na Gravacao\n");
+    }
+    fclose(arq);
 }
 
 void *client_connection_thread(void *client_address)

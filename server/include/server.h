@@ -2,6 +2,7 @@
  * @file server.h
  * @author Vitor Correa da Silva
  * @date 29 May 2020
+ * 
  * @brief Arquivo contendo as estruturas e cabeçalhos de funções do servidor.
  *
  * Esse arquivo contém as definições das funções que são implementadas em server.c.
