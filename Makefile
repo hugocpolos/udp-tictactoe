@@ -4,6 +4,7 @@ all::
 clean::
 	make -C client clean
 	make -C server clean
-distclean::
+	rm -r html/ latex/
+distclean:: clean
 	make -C client distclean
 	make -C server distclean
